@@ -16,6 +16,4 @@ import org.zerhusen.heilen.model.Posicion;
  */
 public interface PosicionRepository extends JpaRepository<Posicion, Long>{
  
-    @Query(value = "SELECT lat, lng from posicion", nativeQuery = true)
-    List<Posicion> listaLATyLNG();
 }

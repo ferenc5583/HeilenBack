@@ -28,7 +28,6 @@ public class EmailMessage {
 	}
 
 	public void setSubject(String subject) {
-            subject = "Correo Testing";
             this.subject = subject;
 	}
 
@@ -37,7 +36,6 @@ public class EmailMessage {
 	}
 
 	public void setBody(String body) {
-            body = "Este es un Correo de pruebas pdt: no pesk el archivo adjunto";
             this.body = body;
 	}
 }

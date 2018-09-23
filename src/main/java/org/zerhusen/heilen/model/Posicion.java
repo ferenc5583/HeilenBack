@@ -5,11 +5,15 @@
  */
 package org.zerhusen.heilen.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import org.zerhusen.model.security.User;
 
 /**
  *
@@ -27,18 +31,20 @@ public class Posicion {
     
     private double lng;
     
-    private long id_usuario;
-
+    @OneToOne
+    @JoinColumn(name = "id_usuario")
+    private User id_usuario;
+    
     public Posicion() {
     }
 
-    public Posicion(double lat, double lng, long id_usuario) {
+    public Posicion(double lat, double lng, User id_usuario) {
         super();
         this.lat = lat;
         this.lng = lng;
         this.id_usuario = id_usuario;
     }
-    
+
 
     @Override
     public String toString() {
@@ -69,13 +75,12 @@ public class Posicion {
         this.lng = lng;
     }
 
-    public long getId_usuario() {
+    public User getId_usuario() {
         return id_usuario;
     }
 
-    public void setId_usuario(long id_usuario) {
+    public void setId_usuario(User id_usuario) {
         this.id_usuario = id_usuario;
     }
-    
     
 }

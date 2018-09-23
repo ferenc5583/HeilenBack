@@ -1,5 +1,7 @@
 package org.zerhusen.model.security;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.util.Date;
 import java.util.List;
 
@@ -38,7 +40,12 @@ public class User {
     @NotNull
     @Size(min = 4, max = 100)
     private String password;
-
+    
+    @Column(name = "RUT", length = 10, unique = true)
+    @NotNull
+    @Size(min = 9, max = 10)
+    private String rut;
+    
     @Column(name = "FIRSTNAME", length = 50)
     @NotNull
     @Size(min = 4, max = 50)
@@ -62,6 +69,10 @@ public class User {
     @Temporal(TemporalType.TIMESTAMP)
     @NotNull
     private Date lastPasswordResetDate;
+    
+    @Column(name = "online")
+    @NotNull
+    private Boolean online;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
@@ -84,6 +95,22 @@ public class User {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public String getRut() {
+        return rut;
+    }
+
+    public void setRut(String rut) {
+        this.rut = rut;
+    }
+
+    public Boolean getOnline() {
+        return online;
+    }
+
+    public void setOnline(Boolean online) {
+        this.online = online;
     }
 
     public String getPassword() {
@@ -126,6 +153,7 @@ public class User {
         this.enabled = enabled;
     }
 
+    @JsonIgnore
     public List<Authority> getAuthorities() {
         return authorities;
     }

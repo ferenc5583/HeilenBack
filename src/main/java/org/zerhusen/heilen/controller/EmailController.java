@@ -69,8 +69,11 @@ public class EmailController {
         msg.setFrom(new InternetAddress(username, false));
         
         msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(emailmessage.getTo_address()));
+        
         msg.setSubject(emailmessage.getSubject());
+        
         msg.setContent(emailmessage.getBody(), "text/html");
+        
         msg.setSentDate(new Date());
         
         MimeBodyPart messageBodyPart = new MimeBodyPart();

@@ -15,32 +15,38 @@ public class JwtUser implements UserDetails {
 
     private final Long id;
     private final String username;
+    private final String rut;
     private final String firstname;
     private final String lastname;
     private final String password;
 //    private final String email;
     private final Collection<? extends GrantedAuthority> authorities;
     private final boolean enabled;
+    private final boolean online;
     private final Date lastPasswordResetDate;
 
     public JwtUser(
           Long id,
           String username,
+          String rut,
           String firstname,
           String lastname,
 //          String email,
           String password, Collection<? extends GrantedAuthority> authorities,
           boolean enabled,
+          boolean online,
           Date lastPasswordResetDate
     ) {
         this.id = id;
         this.username = username;
+        this.rut = rut;
         this.firstname = firstname;
         this.lastname = lastname;
 //        this.email = email;
         this.password = password;
         this.authorities = authorities;
         this.enabled = enabled;
+        this.online = online;
         this.lastPasswordResetDate = lastPasswordResetDate;
     }
 
@@ -52,6 +58,10 @@ public class JwtUser implements UserDetails {
     @Override
     public String getUsername() {
         return username;
+    }
+
+    public String getRut() {
+        return rut;
     }
 
     @JsonIgnore
@@ -98,6 +108,10 @@ public class JwtUser implements UserDetails {
     @Override
     public boolean isEnabled() {
         return enabled;
+    }
+
+    public boolean isOnline() {
+        return online;
     }
 
     @JsonIgnore

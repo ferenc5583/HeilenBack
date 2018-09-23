@@ -6,7 +6,6 @@
 package org.zerhusen.heilen.controller;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Optional;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,15 +39,8 @@ public class PosicionController {
     @CrossOrigin
     @RequestMapping(value = "/posicion/", method = GET)
     public Collection<Posicion> getPosiciones() {
-        //JwtUser eluse = user.getAuthenticatedUser(tokenHeader,jwtTokenUtil,userDetailsService,request); 
+        //JwtUser eluse = user.getAuthenticatedUser(tokenHeader,jwtTokenUtil,userDetailsService,request);         
         return repository.findAll();  
-    }
-    //endpoint que devuelve solo lat y lng
-    @CrossOrigin
-    @RequestMapping(value = "/posicion/posiciones/", method = GET)
-    public List<Posicion> getPosicionesLATyLNG() {
-        //JwtUser eluse = user.getAuthenticatedUser(tokenHeader,jwtTokenUtil,userDetailsService,request); 
-        return repository.listaLATyLNG();  
     }
     
     //Buscar a un
@@ -63,7 +55,6 @@ public class PosicionController {
     @RequestMapping(value = "/posicion/", method = POST)
     @ResponseStatus(HttpStatus.CREATED)
     public Posicion nuevaPosicion(@Valid @RequestBody Posicion posicion) {
-        System.out.println(posicion);
         repository.save(posicion);
         return posicion;
     }
