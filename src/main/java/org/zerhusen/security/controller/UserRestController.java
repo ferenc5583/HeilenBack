@@ -3,6 +3,7 @@ package org.zerhusen.security.controller;
 import com.google.gson.JsonObject;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Objects;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import org.apache.commons.lang.RandomStringUtils;
@@ -11,6 +12,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCrypt;
@@ -43,6 +48,9 @@ public class UserRestController {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private AuthenticationManager authenticationManager;
 
     //busca a un usuario x token
     @CrossOrigin(origins = "*")
@@ -87,7 +95,7 @@ public class UserRestController {
         return lista;
     }
 
-    //busca a un usuario por id
+    //busca a un usuario por id (mala parctica)
     @CrossOrigin
     @RequestMapping(value = "/user/{id}", method = GET)
     public JwtUser getUser(@PathVariable long id) {
@@ -95,6 +103,7 @@ public class UserRestController {
         JwtUser user = (JwtUser) userDetailsService.loadUserByUsername(asd.getUsername());
         return user;
     }
+
     //edita la contraseña de un usuario por el mail
     @CrossOrigin
     @RequestMapping(value = "/user/{mail}", method = RequestMethod.PUT, produces = "application/json")
@@ -103,9 +112,9 @@ public class UserRestController {
         boolean useLetters = true;
         boolean useNumbers = false;
         JsonObject res = new JsonObject();
-        
+
         User userFind = (User) userRepository.UserByUsername(mail);
-        
+
         if (userFind != null) {
             String newPass = RandomStringUtils.random(length, useLetters, useNumbers);
             userRepository.UserEdit(BCrypt.hashpw(newPass, BCrypt.gensalt()), mail);
@@ -116,6 +125,51 @@ public class UserRestController {
             return json_res;
         } else {
             res.addProperty("message", "Usuario no Encontrado123");
+            res.addProperty("find", false);
+            String json_res = res.toString();
+            return json_res;
+        }
+    }
+
+    //buscar username por tokens no pasarlo por front 
+    @CrossOrigin
+    @RequestMapping(value = "/user/passFind/{username},{password}", method = GET, produces = "application/json")
+    public String authenticatedUserCredentials(@PathVariable String username, @PathVariable String password) {
+        Objects.requireNonNull(username);
+        Objects.requireNonNull(password);
+        
+        JsonObject res = new JsonObject();
+
+        try {
+            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
+            res.addProperty("find", true);
+            String json_res = res.toString();
+            return json_res;
+        } catch (DisabledException e) {
+            throw new AuthenticationException("User is disabled!", e);
+        } catch (BadCredentialsException e) {
+            throw new AuthenticationException("Bad credentials!", e);
+        }
+    }
+    
+    //edita la contraseña de un usuario (cambiar por token)
+    @CrossOrigin
+    @RequestMapping(value = "/user/passEdit/{mail},{newPass}", method = RequestMethod.PUT, produces = "application/json")
+    public String editUserPass(@PathVariable String mail, @PathVariable String newPass) {
+        JsonObject res = new JsonObject();
+
+        User userFind = (User) userRepository.UserByUsername(mail);
+
+        if (userFind != null) {
+            
+            userRepository.UserEdit(BCrypt.hashpw(newPass, BCrypt.gensalt()), mail);
+            res.addProperty("message", "Contraseña editada Correctamente");
+            res.addProperty("n_pass", newPass);
+            res.addProperty("find", true);
+            String json_res = res.toString();
+            return json_res;
+        } else {
+            res.addProperty("message", "Usuario no Encontrado");
             res.addProperty("find", false);
             String json_res = res.toString();
             return json_res;

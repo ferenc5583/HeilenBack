@@ -30,4 +30,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query(value = "insert into user_authority (user_id, authority_id) values (?1, ?2)", nativeQuery = true)
     void newAuthority(long user_id, int authority_id);
     
+    @Query(value = "select * from user where id = ?1 and password = ?2", nativeQuery = true)
+    User UserPass(long id, String pass);
+    
 }
