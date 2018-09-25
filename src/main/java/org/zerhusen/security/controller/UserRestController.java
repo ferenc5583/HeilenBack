@@ -29,6 +29,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.POST;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.zerhusen.model.security.User;
+import org.zerhusen.model.security.UserData;
 import org.zerhusen.security.JwtTokenUtil;
 import org.zerhusen.security.JwtUser;
 import org.zerhusen.security.repository.UserRepository;
@@ -41,6 +42,8 @@ public class UserRestController {
 
     @Autowired
     private JwtTokenUtil jwtTokenUtil;
+    
+    UserData user = new UserData();  
 
     @Autowired
     @Qualifier("jwtUserDetailsService")
@@ -81,8 +84,8 @@ public class UserRestController {
 //    "enabled": true,
 //    "lastPasswordResetDate": "2018-09-16"
 //}
+    
     //lista todos los usuarios
-
     @CrossOrigin
     @RequestMapping(value = "/user/todos/", method = GET)
     public Collection<JwtUser> allUsers() {
@@ -104,7 +107,7 @@ public class UserRestController {
         return user;
     }
 
-    //edita la contraseña de un usuario por el mail
+    //edita la contraseña de un usuario por el mail cuando olvida la pass
     @CrossOrigin
     @RequestMapping(value = "/user/{mail}", method = RequestMethod.PUT, produces = "application/json")
     public String editUserTest(@PathVariable String mail) {
@@ -124,24 +127,25 @@ public class UserRestController {
             String json_res = res.toString();
             return json_res;
         } else {
-            res.addProperty("message", "Usuario no Encontrado123");
+            res.addProperty("message", "Usuario no Encontrado");
             res.addProperty("find", false);
             String json_res = res.toString();
             return json_res;
         }
     }
 
-    //buscar username por tokens no pasarlo por front 
+    //cambiar password de un usuario
     @CrossOrigin
-    @RequestMapping(value = "/user/passFind/{username},{password}", method = GET, produces = "application/json")
-    public String authenticatedUserCredentials(@PathVariable String username, @PathVariable String password) {
+    @RequestMapping(value = "/user/passFind/{password}", method = GET, produces = "application/json")
+    public String authenticatedUserCredentials(@PathVariable String password, HttpServletRequest request) {
+        JwtUser username = user.getAuthenticatedUser(tokenHeader,jwtTokenUtil,userDetailsService,request); 
         Objects.requireNonNull(username);
         Objects.requireNonNull(password);
         
         JsonObject res = new JsonObject();
 
         try {
-            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
+            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username.getUsername(), password));
             res.addProperty("find", true);
             String json_res = res.toString();
             return json_res;
@@ -152,17 +156,18 @@ public class UserRestController {
         }
     }
     
-    //edita la contraseña de un usuario (cambiar por token)
+    //edita la contraseña de un usuario dentro del sistema(cambiar por token)
     @CrossOrigin
-    @RequestMapping(value = "/user/passEdit/{mail},{newPass}", method = RequestMethod.PUT, produces = "application/json")
-    public String editUserPass(@PathVariable String mail, @PathVariable String newPass) {
+    @RequestMapping(value = "/user/passEdit/{newPass}", method = RequestMethod.PUT, produces = "application/json")
+    public String editUserPass(@PathVariable String newPass, HttpServletRequest request) {
         JsonObject res = new JsonObject();
 
-        User userFind = (User) userRepository.UserByUsername(mail);
+        JwtUser userMail = user.getAuthenticatedUser(tokenHeader,jwtTokenUtil,userDetailsService,request); 
+        User userFind = (User) userRepository.UserByUsername(userMail.getUsername());
 
         if (userFind != null) {
             
-            userRepository.UserEdit(BCrypt.hashpw(newPass, BCrypt.gensalt()), mail);
+            userRepository.UserEdit(BCrypt.hashpw(newPass, BCrypt.gensalt()), userMail.getUsername());
             res.addProperty("message", "Contraseña editada Correctamente");
             res.addProperty("n_pass", newPass);
             res.addProperty("find", true);
