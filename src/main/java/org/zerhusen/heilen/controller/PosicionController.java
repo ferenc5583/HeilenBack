@@ -7,10 +7,14 @@ package org.zerhusen.heilen.controller;
 
 import java.util.Collection;
 import java.util.Optional;
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -23,6 +27,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.zerhusen.heilen.model.Posicion;
 import org.zerhusen.heilen.repository.PosicionRepository;
+import org.zerhusen.model.security.UserData;
+import org.zerhusen.security.JwtTokenUtil;
 import org.zerhusen.security.JwtUser;
 
 /**
@@ -35,6 +41,21 @@ public class PosicionController {
     @Autowired
     private PosicionRepository repository;
     
+    UserData user = new UserData();  
+    
+    @Value("${jwt.header}")
+    public String tokenHeader;
+
+    @Autowired
+    public JwtTokenUtil jwtTokenUtil;
+
+    @Autowired
+    @Qualifier("jwtUserDetailsService")
+    public UserDetailsService userDetailsService;
+    
+    @Autowired
+    public HttpServletRequest request;
+    
     // Petición GET (Mostrar Todos)
     @CrossOrigin
     @RequestMapping(value = "/posicion/", method = GET)
@@ -42,8 +63,15 @@ public class PosicionController {
         //JwtUser eluse = user.getAuthenticatedUser(tokenHeader,jwtTokenUtil,userDetailsService,request);         
         return repository.findAll();  
     }
+    //endpoint que lista a todos los profesionales
+    @CrossOrigin
+    @RequestMapping(value = "/posicionProf/", method = GET)
+    public Collection<Posicion> getPosicionesProf() {
+        //JwtUser eluse = user.getAuthenticatedUser(tokenHeader,jwtTokenUtil,userDetailsService,request);         
+        return repository.ListaProf();
+    }
     
-    //Buscar a un
+    //Buscar una posicion
     @CrossOrigin
     @RequestMapping(value = "/posicion/{id}", method = GET)
     public Optional<Posicion> getPosicion(@PathVariable long id) {
@@ -74,7 +102,7 @@ public class PosicionController {
         }
     }
     
-    // Petición DELETE(Eliminar Bodega)
+    // Petición DELETE(Eliminar)
     @CrossOrigin
     @RequestMapping(value = "/posicion/{id}", method = DELETE)
     public ResponseEntity<Optional<Posicion>> eliminarPosicion(@PathVariable long id) {
@@ -85,5 +113,13 @@ public class PosicionController {
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+    }
+    
+    // Petición PUT Edita una popsicion de un usuario 
+    @CrossOrigin
+    @RequestMapping(value = "/posicion/editUser/{lat},{lng}", method = PUT)
+    public void actualizarPosicionUser(@Valid @PathVariable double lat, @PathVariable double lng) {
+        JwtUser eluse = user.getAuthenticatedUser(tokenHeader,jwtTokenUtil,userDetailsService,request);
+        repository.UserEditPosition(lat, lng, eluse.getId());
     }
 }

@@ -14,6 +14,10 @@ import org.zerhusen.model.security.User;
 public interface UserRepository extends JpaRepository<User, Long> {
     User findByUsername(String username);
     
+    @Query(value = "select * from user WHERE username = ?1 and id = any "
+            + "(select user_id from user_authority WHERE authority_id = ?2)", nativeQuery = true)
+    User FindXUsernameRole(String username, int role);
+    
     @Query(value = "select * from user where id = ?1", nativeQuery = true)
     User UserxID(long id);
     

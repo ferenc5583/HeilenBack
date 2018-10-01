@@ -41,6 +41,7 @@ public class EmailController {
     @Value("${gmail.password}")
     private String password;
 
+    //mapping de la api para ejecutar la funcion sendemail
     @RequestMapping(value = "/send", method = RequestMethod.POST, produces = "application/json")
     public String sendEmail(@RequestBody EmailMessage emailmessage) throws AddressException, MessagingException, IOException {
         sendmail(emailmessage);
@@ -49,7 +50,7 @@ public class EmailController {
         String json_res = res.toString();
         return json_res;
     }
-
+    //funcion que envia el mail
     private void sendmail(EmailMessage emailmessage) throws AddressException, MessagingException, IOException {
 
         Properties props = new Properties();

@@ -67,7 +67,7 @@ public class UserRestController {
 
     //crea un nuevo usuario paciente
     @CrossOrigin
-    @RequestMapping(value = "/user/nuevo/", method = POST)
+    @RequestMapping(value = "/user/nuevoPaciente/", method = POST)
     @ResponseStatus(HttpStatus.CREATED)
     public User newUser(@Valid @RequestBody User user) {
         userRepository.save(user);
@@ -110,7 +110,7 @@ public class UserRestController {
     //edita la contraseña de un usuario por el mail cuando olvida la pass
     @CrossOrigin
     @RequestMapping(value = "/user/{mail}", method = RequestMethod.PUT, produces = "application/json")
-    public String editUserTest(@PathVariable String mail) {
+    public String editUserPass(@PathVariable String mail) {
         int length = 10;
         boolean useLetters = true;
         boolean useNumbers = false;
@@ -134,7 +134,7 @@ public class UserRestController {
         }
     }
 
-    //cambiar password de un usuario
+    //comrobacion de password de un usuario (true/false)
     @CrossOrigin
     @RequestMapping(value = "/user/passFind/{password}", method = GET, produces = "application/json")
     public String authenticatedUserCredentials(@PathVariable String password, HttpServletRequest request) {
@@ -156,7 +156,7 @@ public class UserRestController {
         }
     }
     
-    //edita la contraseña de un usuario dentro del sistema(cambiar por token)
+    //edita la contraseña de un usuario dentro del sistema
     @CrossOrigin
     @RequestMapping(value = "/user/passEdit/{newPass}", method = RequestMethod.PUT, produces = "application/json")
     public String editUserPass(@PathVariable String newPass, HttpServletRequest request) {
@@ -179,5 +179,13 @@ public class UserRestController {
             String json_res = res.toString();
             return json_res;
         }
+    }
+    //busca aun usuario y determina si el rol al k pertenece x el front
+    @CrossOrigin
+    @RequestMapping(value = "/user/byRole/{username},{role}", method = GET)
+    public JwtUser getUserbyRole(@PathVariable String username, @PathVariable int role) {
+        User asd = (User) userRepository.FindXUsernameRole(username, role);
+        JwtUser user = (JwtUser) userDetailsService.loadUserByUsername(asd.getUsername());
+        return user;
     }
 }
