@@ -122,4 +122,5 @@ public class PosicionController {
         JwtUser eluse = user.getAuthenticatedUser(tokenHeader,jwtTokenUtil,userDetailsService,request);
         repository.UserEditPosition(lat, lng, eluse.getId());
     }
+    
 }
