@@ -20,7 +20,7 @@ import org.zerhusen.heilen.model.Posicion;
 public interface PosicionRepository extends JpaRepository<Posicion, Long>{
  
     @Query(value = "select * from posicion where id_usuario = any "
-            + "(select id from user WHERE id = any "
+            + "(select id from user WHERE online = 1 and id = any "
             + "(select user_id from user_authority WHERE authority_id = 3))", nativeQuery = true)
     Collection<Posicion> ListaProf();
     

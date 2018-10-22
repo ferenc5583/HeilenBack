@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
+import static org.springframework.web.bind.annotation.RequestMethod.PUT;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.zerhusen.model.security.User;
@@ -187,5 +188,12 @@ public class UserRestController {
         User asd = (User) userRepository.FindXUsernameRole(username, role);
         JwtUser user = (JwtUser) userDetailsService.loadUserByUsername(asd.getUsername());
         return user;
+    }
+    //usuario online/offline
+    @CrossOrigin
+    @RequestMapping(value = "/user/isOnline/{status}", method = PUT)
+    public void getUserOnline(@Valid @PathVariable int status, HttpServletRequest request) {
+        JwtUser eluse = user.getAuthenticatedUser(tokenHeader,jwtTokenUtil,userDetailsService,request);
+        userRepository.UserIsOnline(status, eluse.getId());
     }
 }

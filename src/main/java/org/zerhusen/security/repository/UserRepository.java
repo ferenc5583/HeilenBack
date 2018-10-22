@@ -37,4 +37,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query(value = "select * from user where id = ?1 and password = ?2", nativeQuery = true)
     User UserPass(long id, String pass);
     
+    @Transactional
+    @Modifying
+    @Query(value = "update user set online = ?1 where id = ?2", nativeQuery = true)
+    void UserIsOnline(int status ,long id);
 }
