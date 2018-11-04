@@ -29,6 +29,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.POST;
 import static org.springframework.web.bind.annotation.RequestMethod.PUT;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.zerhusen.heilen.repository.PosicionRepository;
 import org.zerhusen.model.security.User;
 import org.zerhusen.model.security.UserData;
 import org.zerhusen.security.JwtTokenUtil;
@@ -52,6 +53,9 @@ public class UserRestController {
 
     @Autowired
     private UserRepository userRepository;
+    
+    @Autowired
+    private PosicionRepository posRepository;
 
     @Autowired
     private AuthenticationManager authenticationManager;
@@ -68,12 +72,24 @@ public class UserRestController {
 
     //crea un nuevo usuario paciente
     @CrossOrigin
-    @RequestMapping(value = "/user/nuevoPaciente/", method = POST)
+    @RequestMapping(value = "/user/nuevoPaciente/", method = POST, produces = "application/json")
     @ResponseStatus(HttpStatus.CREATED)
-    public User newUser(@Valid @RequestBody User user) {
-        userRepository.save(user);
-        userRepository.newAuthority(user.getId(), 1);
-        return user;
+    public String newUser(@Valid @RequestBody User user) {
+        JsonObject res = new JsonObject();
+        
+        User userExist = (User) userRepository.UserExist(user.getUsername(), user.getRut());
+        if(userExist == null){
+            userRepository.save(user);
+            userRepository.newAuthority(user.getId(), 1);
+            posRepository.NewPositionDefault(user.getId());          
+            res.addProperty("exist", false);
+            String json_res = res.toString();
+            return json_res;
+        }else{
+            res.addProperty("exist", true);
+            String json_res = res.toString();
+            return json_res;
+        }   
     }
 //      Json para guardar
 //{

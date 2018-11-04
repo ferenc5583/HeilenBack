@@ -14,6 +14,8 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
@@ -21,6 +23,8 @@ import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import org.springframework.security.crypto.bcrypt.BCrypt;
+import org.zerhusen.heilen.model.Calificacion;
+import org.zerhusen.heilen.model.Especialidad;
 
 @Entity
 @Table(name = "USER")
@@ -73,6 +77,14 @@ public class User {
     @Column(name = "online")
     @NotNull
     private Boolean online;
+    
+    @OneToOne
+    @JoinColumn(name = "id_calificacion")
+    private Calificacion id_calificacion;
+    
+    @ManyToOne
+    @JoinColumn(name = "id_especialidad")
+    private Especialidad id_especialidad;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
@@ -160,6 +172,22 @@ public class User {
 
     public void setAuthorities(List<Authority> authorities) {
         this.authorities = authorities;
+    }
+
+    public Calificacion getId_calificacion() {
+        return id_calificacion;
+    }
+
+    public void setId_calificacion(Calificacion id_calificacion) {
+        this.id_calificacion = id_calificacion;
+    }
+
+    public Especialidad getId_especialidad() {
+        return id_especialidad;
+    }
+
+    public void setId_especialidad(Especialidad id_especialidad) {
+        this.id_especialidad = id_especialidad;
     }
 
     public Date getLastPasswordResetDate() {

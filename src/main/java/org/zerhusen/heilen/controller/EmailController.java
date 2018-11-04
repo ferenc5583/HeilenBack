@@ -78,15 +78,31 @@ public class EmailController {
         msg.setSentDate(new Date());
         
         MimeBodyPart messageBodyPart = new MimeBodyPart();
-        messageBodyPart.setContent(emailmessage.getBody(), "text/html");
+        messageBodyPart.setContent("<html>"
+                +"<body style=\"background-color: #ecf0f1 \">"
+                    +"<table style=\"max-width: 600px; padding: 10px; margin:0 auto; border-collapse: collapse;\">"
+                        +"<tr>"
+                            +"<td style=\"background-color: #ecf0f1\">"
+                                +"<div style=\"color: #34495e; margin: 4% 10% 2%; text-align: justify;font-family: sans-serif\">"
+                                    +"<h2 style=\"color: #e67e22; margin: 0 0 7px\">"+emailmessage.getSubject()+"</h2>"
+                                    +"<p style=\"margin: 2px; font-size: 15px\">\n"+emailmessage.getBody()+"</p>"
+                                    +"<br>"
+                                    +"<p style=\"margin: 2px; font-size: 15px\">Saludos Cordiales</p>"
+                                    +"<p style=\"margin: 2px; font-size: 15px\">Atentamente el equipo de Heilen</p>"
+                                +"</div>"
+                            +"</td>"
+                        +"</tr>"                
+                    +"</table>"
+                +"</body>"
+                +"</html>", "text/html");
         
         Multipart multipart = new MimeMultipart();
         multipart.addBodyPart(messageBodyPart);
-        MimeBodyPart attachPart = new MimeBodyPart();
-        
-        attachPart.attachFile("C:\\Users\\Ferenc\\Pictures\\Imagen1.png");
-        
-        multipart.addBodyPart(attachPart);
+//        MimeBodyPart attachPart = new MimeBodyPart();
+//        
+//        attachPart.attachFile("C:\\Users\\Ferenc\\Pictures\\Imagen1.png");
+//        
+//        multipart.addBodyPart(attachPart);
         
         msg.setContent(multipart);
         //envia el mail

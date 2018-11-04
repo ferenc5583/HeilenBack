@@ -41,4 +41,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Modifying
     @Query(value = "update user set online = ?1 where id = ?2", nativeQuery = true)
     void UserIsOnline(int status ,long id);
+    
+    @Query(value = "select * from user WHERE username =?1 or rut =?2", nativeQuery = true)
+    User UserExist(String username, String rut);
 }

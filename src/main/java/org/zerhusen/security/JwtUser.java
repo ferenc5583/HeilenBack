@@ -7,6 +7,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.zerhusen.heilen.model.Calificacion;
+import org.zerhusen.heilen.model.Especialidad;
 
 /**
  * Created by stephan on 20.03.16.
@@ -23,6 +25,8 @@ public class JwtUser implements UserDetails {
     private final Collection<? extends GrantedAuthority> authorities;
     private final boolean enabled;
     private final boolean online;
+    private final Calificacion id_calificacion;
+    private final Especialidad id_especialidad;
     private final Date lastPasswordResetDate;
 
     public JwtUser(
@@ -35,6 +39,8 @@ public class JwtUser implements UserDetails {
           String password, Collection<? extends GrantedAuthority> authorities,
           boolean enabled,
           boolean online,
+          Calificacion id_calificacion,
+          Especialidad id_especialidad,
           Date lastPasswordResetDate
     ) {
         this.id = id;
@@ -47,6 +53,8 @@ public class JwtUser implements UserDetails {
         this.authorities = authorities;
         this.enabled = enabled;
         this.online = online;
+        this.id_calificacion = id_calificacion;
+        this.id_especialidad = id_especialidad;
         this.lastPasswordResetDate = lastPasswordResetDate;
     }
 
@@ -112,6 +120,14 @@ public class JwtUser implements UserDetails {
 
     public boolean isOnline() {
         return online;
+    }
+
+    public Calificacion getId_calificacion() {
+        return id_calificacion;
+    }
+
+    public Especialidad getId_especialidad() {
+        return id_especialidad;
     }
 
     @JsonIgnore

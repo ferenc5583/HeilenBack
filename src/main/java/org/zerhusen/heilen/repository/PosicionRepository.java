@@ -20,7 +20,7 @@ import org.zerhusen.heilen.model.Posicion;
 public interface PosicionRepository extends JpaRepository<Posicion, Long>{
  
     @Query(value = "select * from posicion where id_usuario = any "
-            + "(select id from user WHERE online = 1 and id = any "
+            + "(select id from user WHERE enabled = 1 and online = 1 and id = any "
             + "(select user_id from user_authority WHERE authority_id = 3))", nativeQuery = true)
     Collection<Posicion> ListaProf();
     
@@ -28,4 +28,10 @@ public interface PosicionRepository extends JpaRepository<Posicion, Long>{
     @Modifying
     @Query(value = "update posicion set lat = ?1, lng = ?2 where id_usuario = ?3", nativeQuery = true)
     void UserEditPosition(double lat, double lng, long id);
+    
+    @Transactional
+    @Modifying
+    @Query(value = "insert into posicion (lat, lng, id_usuario) values (0, 0, ?1)", nativeQuery = true)
+    void NewPositionDefault(long id);
+    
 }
