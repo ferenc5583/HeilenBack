@@ -7,6 +7,7 @@ package org.zerhusen.heilen.repository;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import javax.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -20,9 +21,9 @@ import org.zerhusen.heilen.model.Posicion;
 public interface PosicionRepository extends JpaRepository<Posicion, Long>{
  
     @Query(value = "select * from posicion where id_usuario = any "
-            + "(select id from user WHERE enabled = 1 and online = 1 and id = any "
-            + "(select user_id from user_authority WHERE authority_id = 3))", nativeQuery = true)
-    Collection<Posicion> ListaProf();
+            + "(select id from user WHERE enabled = 1 and online = 1 and id = any"
+            + "(select user_id from user_authority WHERE authority_id = 3 and user_id != ?1))", nativeQuery = true)
+    Collection<Posicion> ListaProf(long id_user_less);
     
     @Transactional
     @Modifying
@@ -33,5 +34,8 @@ public interface PosicionRepository extends JpaRepository<Posicion, Long>{
     @Modifying
     @Query(value = "insert into posicion (lat, lng, id_usuario) values (0, 0, ?1)", nativeQuery = true)
     void NewPositionDefault(long id);
+    
+    @Query(value = "select * from posicion where id_usuario = ?1", nativeQuery = true)
+    Optional<Posicion> PosicionUserId(long id_user);
     
 }

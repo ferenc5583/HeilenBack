@@ -44,4 +44,10 @@ public interface UserRepository extends JpaRepository<User, Long> {
     
     @Query(value = "select * from user WHERE username =?1 or rut =?2", nativeQuery = true)
     User UserExist(String username, String rut);
+    
+    @Transactional
+    @Modifying
+    @Query(value = "insert into authority (name) values (?1)", nativeQuery = true)
+    void addRoles(String role);
+    
 }

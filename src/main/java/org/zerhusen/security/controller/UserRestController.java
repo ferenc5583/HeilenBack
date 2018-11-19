@@ -3,7 +3,9 @@ package org.zerhusen.security.controller;
 import com.google.gson.JsonObject;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.Objects;
+import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import org.apache.commons.lang.RandomStringUtils;
@@ -29,6 +31,8 @@ import static org.springframework.web.bind.annotation.RequestMethod.POST;
 import static org.springframework.web.bind.annotation.RequestMethod.PUT;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.zerhusen.heilen.model.Calificacion;
+import org.zerhusen.heilen.repository.CalificacionRepository;
 import org.zerhusen.heilen.repository.PosicionRepository;
 import org.zerhusen.model.security.User;
 import org.zerhusen.model.security.UserData;
@@ -56,6 +60,9 @@ public class UserRestController {
     
     @Autowired
     private PosicionRepository posRepository;
+    
+    @Autowired
+    private CalificacionRepository caliRepository;
 
     @Autowired
     private AuthenticationManager authenticationManager;
@@ -91,16 +98,31 @@ public class UserRestController {
             return json_res;
         }   
     }
-//      Json para guardar
-//{
-//    "username": "ferenc@user.com",
-//    "password": "123456",
-//    "firstname": "Ferenc",
-//    "lastname": "Riquelme",
-//    "authorities": [ { "id": 1} ],
-//    "enabled": true,
-//    "lastPasswordResetDate": "2018-09-16"
-//}
+    
+    //crea un nuevo usuario profesional
+    @CrossOrigin
+    @RequestMapping(value = "/user/nuevoProfesional/", method = POST, produces = "application/json")
+    @ResponseStatus(HttpStatus.CREATED)
+    public String newUserProf(@Valid @RequestBody User user) {
+        JsonObject res = new JsonObject();
+        Calificacion calificacion = new Calificacion(1,5,0,5);
+        user.setId_calificacion(calificacion);
+        
+        User userExist = (User) userRepository.UserExist(user.getUsername(), user.getRut());
+        if(userExist == null){
+            caliRepository.save(calificacion);
+            userRepository.save(user);
+            userRepository.newAuthority(user.getId(), 3);
+            posRepository.NewPositionDefault(user.getId());
+            res.addProperty("exist", false);
+            String json_res = res.toString();
+            return json_res;
+        }else{
+            res.addProperty("exist", true);
+            String json_res = res.toString();
+            return json_res;
+        }   
+    }
     
     //lista todos los usuarios
     @CrossOrigin
@@ -212,4 +234,18 @@ public class UserRestController {
         JwtUser eluse = user.getAuthenticatedUser(tokenHeader,jwtTokenUtil,userDetailsService,request);
         userRepository.UserIsOnline(status, eluse.getId());
     }
+    
+    //post construct para agregar lor roles
+    @PostConstruct
+    public void init() {
+        if (userRepository.findAll().isEmpty() == true) {
+           Date fecha = new Date(); 
+           User user = new User("user@default.tk","$2a$10$XDfGBV91jUQpWbgtmxIK1OlY3vgYo6m6PnQgyqBBht1jrcoSxRf/e","11111111-1","default","user",true,fecha,true);
+           userRepository.save(user);
+           userRepository.addRoles("ROLE_USER");
+           userRepository.addRoles("ROLE_ADMIN");
+           userRepository.addRoles("ROLE_PRO");
+        }
+    }
 }
+

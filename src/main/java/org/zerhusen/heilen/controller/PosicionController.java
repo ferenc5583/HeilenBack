@@ -67,8 +67,8 @@ public class PosicionController {
     @CrossOrigin
     @RequestMapping(value = "/posicionProf/", method = GET)
     public Collection<Posicion> getPosicionesProf() {
-        //JwtUser eluse = user.getAuthenticatedUser(tokenHeader,jwtTokenUtil,userDetailsService,request);         
-        return repository.ListaProf();
+        JwtUser eluse = user.getAuthenticatedUser(tokenHeader,jwtTokenUtil,userDetailsService,request);         
+        return repository.ListaProf(eluse.getId());
     }
     
     //Buscar una posicion
@@ -123,4 +123,10 @@ public class PosicionController {
         repository.UserEditPosition(lat, lng, eluse.getId());
     }
     
+    //Buscar una posicion x id_user
+    @CrossOrigin
+    @RequestMapping(value = "/posicionUserId/{id_user}", method = GET)
+    public Optional<Posicion> getPosicionUser(@PathVariable long id_user) {
+        return repository.PosicionUserId(id_user);
+    }  
 }
