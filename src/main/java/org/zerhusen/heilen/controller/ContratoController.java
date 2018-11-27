@@ -5,6 +5,7 @@
  */
 package org.zerhusen.heilen.controller;
 
+import static com.sun.corba.se.spi.presentation.rmi.StubAdapter.request;
 import java.util.Collection;
 import java.util.Optional;
 import javax.servlet.http.HttpServletRequest;
@@ -25,8 +26,8 @@ import static org.springframework.web.bind.annotation.RequestMethod.POST;
 import static org.springframework.web.bind.annotation.RequestMethod.PUT;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import org.zerhusen.heilen.model.Posicion;
-import org.zerhusen.heilen.repository.PosicionRepository;
+import org.zerhusen.heilen.model.Contrato;
+import org.zerhusen.heilen.repository.ContratoRepository;
 import org.zerhusen.model.security.UserData;
 import org.zerhusen.security.JwtTokenUtil;
 import org.zerhusen.security.JwtUser;
@@ -36,12 +37,12 @@ import org.zerhusen.security.JwtUser;
  * @author Ferenc
  */
 @RestController
-public class PosicionController {
+public class ContratoController {
     
     @Autowired
-    private PosicionRepository repository;
+    private ContratoRepository repository;
     
-    UserData user = new UserData();  
+    UserData user = new UserData(); 
     
     @Value("${jwt.header}")
     public String tokenHeader;
@@ -58,45 +59,38 @@ public class PosicionController {
     
     // Petición GET (Mostrar Todos)
     @CrossOrigin
-    @RequestMapping(value = "/posicion/", method = GET)
-    public Collection<Posicion> getPosiciones() {
+    @RequestMapping(value = "/contrato/", method = GET)
+    public Collection<Contrato> getContratos() {
         //JwtUser eluse = user.getAuthenticatedUser(tokenHeader,jwtTokenUtil,userDetailsService,request);         
         return repository.findAll();  
     }
-    //endpoint que lista a todos los profesionales menos al uduario
-    @CrossOrigin
-    @RequestMapping(value = "/posicionProf/", method = GET)
-    public Collection<Posicion> getPosicionesProf() {
-        JwtUser eluse = user.getAuthenticatedUser(tokenHeader,jwtTokenUtil,userDetailsService,request);         
-        return repository.ListaProf(eluse.getId());
-    }
     
-    //Buscar una posicion
+    //Buscar una contrato
     @CrossOrigin
-    @RequestMapping(value = "/posicion/{id}", method = GET)
-    public Optional<Posicion> getPosicion(@PathVariable long id) {
+    @RequestMapping(value = "/contrato/{id}", method = GET)
+    public Optional<Contrato> getContrato(@PathVariable long id) {
         return repository.findById(id);
     }
     
     // Petición POST Agregar
     @CrossOrigin
-    @RequestMapping(value = "/posicion/", method = POST)
+    @RequestMapping(value = "/contrato/", method = POST)
     @ResponseStatus(HttpStatus.CREATED)
-    public Posicion nuevaPosicion(@Valid @RequestBody Posicion posicion) {
-        repository.save(posicion);
-        return posicion;
+    public Contrato nuevoContrato(@Valid @RequestBody Contrato contrato) {
+        repository.save(contrato);
+        return contrato;
     }
     
     // Petición PUT Editar 
     @CrossOrigin
-    @RequestMapping(value = "/posicion/{id}", method = PUT)
-    public ResponseEntity<Optional<Posicion>> actualizarPosicion(@Valid @PathVariable long id, @RequestBody Posicion actualizarPosicion) {
-        Optional<Posicion> posicion = repository.findById(id);
-        if (posicion != null) {
+    @RequestMapping(value = "/contrato/{id}", method = PUT)
+    public ResponseEntity<Optional<Contrato>> actualizarContrato(@Valid @PathVariable long id, @RequestBody Contrato actualizarContrato) {
+        Optional<Contrato> contrato = repository.findById(id);
+        if (contrato != null) {
 
-            actualizarPosicion.setId(id);
-            repository.save(actualizarPosicion);
-            return new ResponseEntity<>(posicion, HttpStatus.OK);
+            actualizarContrato.setId(id);
+            repository.save(actualizarContrato);
+            return new ResponseEntity<>(contrato, HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -104,29 +98,23 @@ public class PosicionController {
     
     // Petición DELETE(Eliminar)
     @CrossOrigin
-    @RequestMapping(value = "/posicion/{id}", method = DELETE)
-    public ResponseEntity<Optional<Posicion>> eliminarPosicion(@PathVariable long id) {
-        Optional<Posicion> posicion = repository.findById(id);
+    @RequestMapping(value = "/contrato/{id}", method = DELETE)
+    public ResponseEntity<Optional<Contrato>> eliminarContrato(@PathVariable long id) {
+        Optional<Contrato> contrato = repository.findById(id);
         repository.deleteById(id);
-        if (posicion != null) {
-            return new ResponseEntity<>(posicion, HttpStatus.OK);
+        if (contrato != null) {
+            return new ResponseEntity<>(contrato, HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
     
-    // Petición PUT Edita una popsicion de un usuario 
-    @CrossOrigin
-    @RequestMapping(value = "/posicion/editUser/{lat},{lng}", method = PUT)
-    public void actualizarPosicionUser(@Valid @PathVariable double lat, @PathVariable double lng) {
-        JwtUser eluse = user.getAuthenticatedUser(tokenHeader,jwtTokenUtil,userDetailsService,request);
-        repository.UserEditPosition(lat, lng, eluse.getId());
-    }
     
-    //Buscar una posicion x id_user
+    // Petición GET todos los contratos de un usuario paciente
     @CrossOrigin
-    @RequestMapping(value = "/posicionUserId/{id_user}", method = GET)
-    public Optional<Posicion> getPosicionUser(@PathVariable long id_user) {
-        return repository.PosicionUserId(id_user);
-    }  
+    @RequestMapping(value = "/contrato/miscontratos/", method = GET)
+    public Collection<Contrato> getContratosXUser() {
+        JwtUser eluse = user.getAuthenticatedUser(tokenHeader,jwtTokenUtil,userDetailsService,request);         
+        return repository.ContratosXUser(eluse.getId());  
+    }
 }

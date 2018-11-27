@@ -41,9 +41,6 @@ public class EspecialidadController {
             //guarda enfermero
             Especialidad enfermero = new Especialidad("Enfermero");
             repository.save(enfermero);
-            //guarda tecnico enfermero
-            Especialidad tecEnfermero = new Especialidad("Tecnico Enfermero");
-            repository.save(tecEnfermero);
             //guarda kinesiologo
             Especialidad kinesiologo = new Especialidad("Kinesiologo");
             repository.save(kinesiologo);
