@@ -5,6 +5,7 @@
  */
 package org.zerhusen.heilen.controller;
 
+import com.google.gson.JsonObject;
 import static com.sun.corba.se.spi.presentation.rmi.StubAdapter.request;
 import java.util.Collection;
 import java.util.Optional;
@@ -77,8 +78,22 @@ public class ContratoController {
     @RequestMapping(value = "/contrato/", method = POST)
     @ResponseStatus(HttpStatus.CREATED)
     public Contrato nuevoContrato(@Valid @RequestBody Contrato contrato) {
-        repository.save(contrato);
-        return contrato;
+        
+        JwtUser eluse = user.getAuthenticatedUser(tokenHeader,jwtTokenUtil,userDetailsService,request);
+        Contrato elcontrato = new Contrato();
+        
+        elcontrato.setAceptada(false);
+        elcontrato.setCalificada(false);
+        elcontrato.setDetalle("primer detalle por back");
+        elcontrato.setId_paciente(eluse.getId());
+        elcontrato.setId_profesional(contrato.getId_profesional());
+        elcontrato.setMonto(contrato.getMonto());
+        elcontrato.setFecha(contrato.getFecha());
+        elcontrato.setHora(contrato.getHora());
+        elcontrato.setTerminada(false);
+        elcontrato.setEnabled(true);
+        repository.save(elcontrato);
+        return elcontrato;
     }
     
     // Petición PUT Editar 
@@ -116,5 +131,25 @@ public class ContratoController {
     public Collection<Contrato> getContratosXUser() {
         JwtUser eluse = user.getAuthenticatedUser(tokenHeader,jwtTokenUtil,userDetailsService,request);         
         return repository.ContratosXUser(eluse.getId());  
+    }
+    
+    // Petición GET a un profesional notificando una solicitud
+    @CrossOrigin
+    @RequestMapping(value = "/contrato/notifier/", method = GET)
+    public Optional<Contrato> getNotifier() {
+        JwtUser eluse = user.getAuthenticatedUser(tokenHeader,jwtTokenUtil,userDetailsService,request);         
+        return repository.ProNotifier(eluse.getId()); 
+    }
+    
+    // Petición PUT para cambiar estados del contrato
+    @CrossOrigin
+    @RequestMapping(value = "/contrato/estados/{aceptada},{terminada},{calificada},{id}", method = PUT, produces = "application/json")
+    public String desContrato(@PathVariable int aceptada, @PathVariable int terminada, @PathVariable int calificada, @PathVariable long id) {
+        JsonObject res = new JsonObject();
+        
+        repository.DesContrato(0, aceptada, terminada, calificada, id);
+        
+        res.addProperty("peticion_editada", true);
+        return res.toString();
     }
 }

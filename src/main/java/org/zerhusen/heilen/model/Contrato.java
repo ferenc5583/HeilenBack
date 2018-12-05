@@ -5,6 +5,7 @@
  */
 package org.zerhusen.heilen.model;
 
+import java.sql.Time;
 import java.util.Date;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -28,29 +29,32 @@ public class Contrato {
     private long id_profesional;
     private String detalle;
     private long monto;
+    private boolean enabled;
     private boolean aceptada;
     private boolean terminada;
     private boolean calificada;
-    private Date fecha;
+    private String fecha;
+    private String hora;
 
     public Contrato() {
     }
 
-    public Contrato(long id_paciente, long id_profesional, String detalle, long monto, boolean aceptada, boolean terminada, boolean calificada, Date fecha) {
-        super();
+    public Contrato(long id_paciente, long id_profesional, String detalle, long monto, boolean enabled, boolean aceptada, boolean terminada, boolean calificada, String fecha, String hora) {
         this.id_paciente = id_paciente;
         this.id_profesional = id_profesional;
         this.detalle = detalle;
         this.monto = monto;
+        this.enabled = enabled;
         this.aceptada = aceptada;
         this.terminada = terminada;
         this.calificada = calificada;
         this.fecha = fecha;
+        this.hora = hora;
     }
 
     @Override
     public String toString() {
-        return "Contrato{" + "id=" + id + ", id_paciente=" + id_paciente + ", id_profesional=" + id_profesional + ", detalle=" + detalle + ", monto=" + monto + ", aceptada=" + aceptada + ", terminada=" + terminada + ", calificada=" + calificada + ", fecha=" + fecha + '}';
+        return "Contrato{" + "id=" + id + ", id_paciente=" + id_paciente + ", id_profesional=" + id_profesional + ", detalle=" + detalle + ", monto=" + monto + ", enabled=" + enabled + ", aceptada=" + aceptada + ", terminada=" + terminada + ", calificada=" + calificada + ", fecha=" + fecha + ", hora=" + hora + '}';
     }
 
     public long getId() {
@@ -117,12 +121,28 @@ public class Contrato {
         this.calificada = calificada;
     }
 
-    public Date getFecha() {
+    public String getFecha() {
         return fecha;
     }
 
-    public void setFecha(Date fecha) {
+    public void setFecha(String fecha) {
         this.fecha = fecha;
+    }
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
+
+    public String getHora() {
+        return hora;
+    }
+
+    public void setHora(String hora) {
+        this.hora = hora;
     }
     
 }
