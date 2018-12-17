@@ -48,8 +48,8 @@ public class UserRestController {
 
     @Autowired
     private JwtTokenUtil jwtTokenUtil;
-    
-    UserData user = new UserData();  
+
+    UserData user = new UserData();
 
     @Autowired
     @Qualifier("jwtUserDetailsService")
@@ -57,10 +57,10 @@ public class UserRestController {
 
     @Autowired
     private UserRepository userRepository;
-    
+
     @Autowired
     private PosicionRepository posRepository;
-    
+
     @Autowired
     private CalificacionRepository caliRepository;
 
@@ -83,33 +83,33 @@ public class UserRestController {
     @ResponseStatus(HttpStatus.CREATED)
     public String newUser(@Valid @RequestBody User user) {
         JsonObject res = new JsonObject();
-        
+
         User userExist = (User) userRepository.UserExist(user.getUsername(), user.getRut());
-        if(userExist == null){
+        if (userExist == null) {
             userRepository.save(user);
             userRepository.newAuthority(user.getId(), 1);
-            posRepository.NewPositionDefault(user.getId());          
+            posRepository.NewPositionDefault(user.getId());
             res.addProperty("exist", false);
             String json_res = res.toString();
             return json_res;
-        }else{
+        } else {
             res.addProperty("exist", true);
             String json_res = res.toString();
             return json_res;
-        }   
+        }
     }
-    
+
     //crea un nuevo usuario profesional
     @CrossOrigin
     @RequestMapping(value = "/user/nuevoProfesional/", method = POST, produces = "application/json")
     @ResponseStatus(HttpStatus.CREATED)
     public String newUserProf(@Valid @RequestBody User user) {
         JsonObject res = new JsonObject();
-        Calificacion calificacion = new Calificacion(1,5,0,5);
+        Calificacion calificacion = new Calificacion(1, 5, 0, 5);
         user.setId_calificacion(calificacion);
-        
+
         User userExist = (User) userRepository.UserExist(user.getUsername(), user.getRut());
-        if(userExist == null){
+        if (userExist == null) {
             caliRepository.save(calificacion);
             userRepository.save(user);
             userRepository.newAuthority(user.getId(), 3);
@@ -117,13 +117,13 @@ public class UserRestController {
             res.addProperty("exist", false);
             String json_res = res.toString();
             return json_res;
-        }else{
+        } else {
             res.addProperty("exist", true);
             String json_res = res.toString();
             return json_res;
-        }   
+        }
     }
-    
+
     //lista todos los usuarios
     @CrossOrigin
     @RequestMapping(value = "/user/todos/", method = GET)
@@ -177,10 +177,10 @@ public class UserRestController {
     @CrossOrigin
     @RequestMapping(value = "/user/passFind/{password}", method = GET, produces = "application/json")
     public String authenticatedUserCredentials(@PathVariable String password, HttpServletRequest request) {
-        JwtUser username = user.getAuthenticatedUser(tokenHeader,jwtTokenUtil,userDetailsService,request); 
+        JwtUser username = user.getAuthenticatedUser(tokenHeader, jwtTokenUtil, userDetailsService, request);
         Objects.requireNonNull(username);
         Objects.requireNonNull(password);
-        
+
         JsonObject res = new JsonObject();
 
         try {
@@ -194,18 +194,18 @@ public class UserRestController {
             throw new AuthenticationException("Bad credentials!", e);
         }
     }
-    
+
     //edita la contraseña de un usuario dentro del sistema
     @CrossOrigin
     @RequestMapping(value = "/user/passEdit/{newPass}", method = RequestMethod.PUT, produces = "application/json")
     public String editUserPass(@PathVariable String newPass, HttpServletRequest request) {
         JsonObject res = new JsonObject();
 
-        JwtUser userMail = user.getAuthenticatedUser(tokenHeader,jwtTokenUtil,userDetailsService,request); 
+        JwtUser userMail = user.getAuthenticatedUser(tokenHeader, jwtTokenUtil, userDetailsService, request);
         User userFind = (User) userRepository.UserByUsername(userMail.getUsername());
 
         if (userFind != null) {
-            
+
             userRepository.UserEdit(BCrypt.hashpw(newPass, BCrypt.gensalt()), userMail.getUsername());
             res.addProperty("message", "Contraseña editada Correctamente");
             res.addProperty("n_pass", newPass);
@@ -219,6 +219,7 @@ public class UserRestController {
             return json_res;
         }
     }
+
     //busca aun usuario y determina si el rol al k pertenece x el front
     @CrossOrigin
     @RequestMapping(value = "/user/byRole/{username},{role}", method = GET)
@@ -227,25 +228,40 @@ public class UserRestController {
         JwtUser user = (JwtUser) userDetailsService.loadUserByUsername(asd.getUsername());
         return user;
     }
+
     //usuario online/offline
     @CrossOrigin
     @RequestMapping(value = "/user/isOnline/{status}", method = PUT)
     public void getUserOnline(@Valid @PathVariable int status, HttpServletRequest request) {
-        JwtUser eluse = user.getAuthenticatedUser(tokenHeader,jwtTokenUtil,userDetailsService,request);
+        JwtUser eluse = user.getAuthenticatedUser(tokenHeader, jwtTokenUtil, userDetailsService, request);
         userRepository.UserIsOnline(status, eluse.getId());
     }
-    
+
     //post construct para agregar lor roles
     @PostConstruct
     public void init() {
         if (userRepository.findAll().isEmpty() == true) {
-           Date fecha = new Date(); 
-           User user = new User("user@default.tk","$2a$10$XDfGBV91jUQpWbgtmxIK1OlY3vgYo6m6PnQgyqBBht1jrcoSxRf/e","11111111-1","default","user",true,fecha,true);
-           userRepository.save(user);
-           userRepository.addRoles("ROLE_USER");
-           userRepository.addRoles("ROLE_ADMIN");
-           userRepository.addRoles("ROLE_PRO");
+            Date fecha = new Date();
+            User user = new User("user@default.tk", "$2a$10$XDfGBV91jUQpWbgtmxIK1OlY3vgYo6m6PnQgyqBBht1jrcoSxRf/e", "11111111-1", "default", "user", true, fecha, true);
+            userRepository.save(user);
+            userRepository.addRoles("ROLE_USER");
+            userRepository.addRoles("ROLE_ADMIN");
+            userRepository.addRoles("ROLE_PRO");
         }
     }
-}
 
+    //put para editar la especialidad del profesional
+    @CrossOrigin
+    @RequestMapping(value = "/user/especiEdit/{idEsp}", method = RequestMethod.PUT, produces = "application/json")
+    public String especiEdit(@PathVariable int idEsp, HttpServletRequest request) {
+        JsonObject res = new JsonObject();
+
+        JwtUser eluse = user.getAuthenticatedUser(tokenHeader, jwtTokenUtil, userDetailsService, request);
+
+        userRepository.especiEdit(idEsp, eluse.getId());
+        
+        res.addProperty("editada", true);
+
+        return res.toString();
+    }
+}

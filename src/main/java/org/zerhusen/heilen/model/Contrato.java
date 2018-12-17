@@ -33,13 +33,15 @@ public class Contrato {
     private boolean aceptada;
     private boolean terminada;
     private boolean calificada;
+    private boolean cancelada;
     private String fecha;
     private String hora;
 
     public Contrato() {
     }
 
-    public Contrato(long id_paciente, long id_profesional, String detalle, long monto, boolean enabled, boolean aceptada, boolean terminada, boolean calificada, String fecha, String hora) {
+    public Contrato(long id_paciente, long id_profesional, String detalle, long monto, boolean enabled, boolean aceptada, boolean terminada, boolean calificada, boolean cancelada, String fecha, String hora) {
+        super();
         this.id_paciente = id_paciente;
         this.id_profesional = id_profesional;
         this.detalle = detalle;
@@ -48,13 +50,14 @@ public class Contrato {
         this.aceptada = aceptada;
         this.terminada = terminada;
         this.calificada = calificada;
+        this.cancelada = cancelada;
         this.fecha = fecha;
         this.hora = hora;
     }
 
     @Override
     public String toString() {
-        return "Contrato{" + "id=" + id + ", id_paciente=" + id_paciente + ", id_profesional=" + id_profesional + ", detalle=" + detalle + ", monto=" + monto + ", enabled=" + enabled + ", aceptada=" + aceptada + ", terminada=" + terminada + ", calificada=" + calificada + ", fecha=" + fecha + ", hora=" + hora + '}';
+        return "Contrato{" + "id=" + id + ", id_paciente=" + id_paciente + ", id_profesional=" + id_profesional + ", detalle=" + detalle + ", monto=" + monto + ", enabled=" + enabled + ", aceptada=" + aceptada + ", terminada=" + terminada + ", calificada=" + calificada + ", cancelada=" + cancelada + ", fecha=" + fecha + ", hora=" + hora + '}';
     }
 
     public long getId() {
@@ -143,6 +146,14 @@ public class Contrato {
 
     public void setHora(String hora) {
         this.hora = hora;
+    }
+
+    public boolean isCancelada() {
+        return cancelada;
+    }
+
+    public void setCancelada(boolean cancelada) {
+        this.cancelada = cancelada;
     }
     
 }

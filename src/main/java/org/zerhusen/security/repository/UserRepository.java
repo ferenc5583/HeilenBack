@@ -49,5 +49,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Modifying
     @Query(value = "insert into authority (name) values (?1)", nativeQuery = true)
     void addRoles(String role);
-    
+       
+    @Transactional
+    @Modifying
+    @Query(value = "update user set id_especialidad =?1 where id =?2", nativeQuery = true)
+    void especiEdit(int especialidad ,long id);
 }
